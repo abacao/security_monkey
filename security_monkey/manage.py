@@ -207,7 +207,8 @@ def amazon_accounts():
 @manager.command
 @manager.option('-e', '--email', dest='email', type=text_type, required=True)
 @manager.option('-r', '--role', dest='role', type=str, required=True)
-def create_user(email, role):
+@manager.option('-p', '--password', dest='password', type=str, required=False)
+def create_user(email, role, password):
     from flask_security import SQLAlchemyUserDatastore
     from security_monkey.datastore import User
     from security_monkey.datastore import Role
@@ -222,31 +223,34 @@ def create_user(email, role):
 
     users = User.query.filter(User.email == email)
 
-    if users.count() == 0:
-        password1 = prompt_pass("Password")
-        password2 = prompt_pass("Confirm Password")
+    if users.password == 0:
+        user.password = encrypt_password(User.password)
+    else
+      if users.count() == 0:
+          password1 = prompt_pass("Password")
+          password2 = prompt_pass("Confirm Password")
 
-        if password1 != password2:
-            sys.stderr.write("[!] Passwords do not match\n")
-            sys.exit(1)
+          if password1 != password2:
+              sys.stderr.write("[!] Passwords do not match\n")
+              sys.exit(1)
 
-        user = user_datastore.create_user(email=email,
-                                          password=encrypt_password(password1),
-                                          confirmed_at=datetime.now())
-    else:
-        sys.stdout.write("[+] Updating existing user\n")
-        user = users.first()
+          user = user_datastore.create_user(email=email,
+                                            password=encrypt_password(password1),
+                                            confirmed_at=datetime.now())
+      else:
+          sys.stdout.write("[+] Updating existing user\n")
+          user = users.first()
 
-        password1 = prompt_pass("Password")
-        password2 = prompt_pass("Confirm Password")
+          password1 = prompt_pass("Password")
+          password2 = prompt_pass("Confirm Password")
 
-        if password1 != password2:
-            sys.stderr.write("[!] Passwords do not match\n")
-            sys.exit(1)
+          if password1 != password2:
+              sys.stderr.write("[!] Passwords do not match\n")
+              sys.exit(1)
 
-        user.password = encrypt_password(password1)
+          user.password = encrypt_password(password1)
 
-    user.role = role
+      user.role = role
 
     db.session.add(user)
     db.session.commit()
