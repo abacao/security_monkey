@@ -214,7 +214,7 @@ def create_user(email, role, password):
     from security_monkey.datastore import Role
     from flask_security.utils import encrypt_password
 
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role, Password)
 
     ROLES = ['View', 'Comment', 'Justify', 'Admin']
     if role not in ROLES:
